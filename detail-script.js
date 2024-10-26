@@ -117,38 +117,35 @@ document.getElementById("submitBooking").addEventListener("click", async () => {
   const email = document.getElementById("email").value;
   const phoneNumber = document.getElementById("phoneNumber").value;
 
-  try {
-    const response = await fetch(
-      "https://bookmyshow-backend-3-jyjd.onrender.com/movie/book-movie",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          movieId,
-          showId,
-          seats,
-          name,
-          email,
-          phoneNumber,
-        }),
-      }
-    );
-    const result = await response.json();
+  console.log("Booking Details:", { movieId, showId, seats, name, email, phoneNumber }); // Debugging line
 
-    if (response.ok) {
-      const bookingModal = bootstrap.Modal.getInstance(
-        document.getElementById("bookingModal")
-      );
-      bookingModal.hide();
-      alert("Tickets booked successfully!");
-      window.location.reload();
+  try {
+    const response = await fetch("https://bookmyshow-backend-3-jyjd.onrender.com/movie/book-movie", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ movieId, showId, seats, name, email, phoneNumber }),
+    });
+
+    console.log("Response Status:", response.status); // Debugging line
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to book tickets');
     }
+
+    const result = await response.json();
+    console.log("Booking Result:", result); // Debugging line
+
+    const bookingModal = bootstrap.Modal.getInstance(document.getElementById("bookingModal"));
+    bookingModal.hide();
+
+    alert("Tickets booked successfully!");
+    window.location.reload();
+    
   } catch (error) {
-    alert("Something Went Wrong!");
+    alert("Something went wrong! " + error.message);
   }
 });
+
 
 function bookTickets(movieId, showId, date) {
   // Set the values of modal input fields
